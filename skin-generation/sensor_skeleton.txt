@@ -1,0 +1,45 @@
+<!--
+    SENSOR_DESCRIPTION
+  -->
+  <link name="SENSOR_LINK_NAME">
+    <inertial>
+      <mass value="2e-08"/>
+      <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0" izz="1.1e-09"/>
+    </inertial>
+    
+    <visual>
+      <geometry>
+        <sphere radius="0.0025"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+    
+    <collision name="COLLISION_NAME">
+      <geometry>
+        <sphere radius="0.0025"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+  </link>
+
+  <joint name="SENSOR_JOINT_NAME" type="fixed">
+    <parent link="SENSOR_PARENT"/>
+    <child link="SENSOR_LINK_NAME"/>
+	<origin rpy="0 0 0" xyz="XYZ"/>
+  </joint>
+
+  <gazebo reference="SENSOR_LINK_NAME">
+    <mu1>0.5</mu1>
+    <mu2>0.5</mu2>
+    <selfCollide>true</selfCollide>
+    <turnGravityOff>false</turnGravityOff>
+	<sensor name="SENSOR_NAME" type="contact">
+      <always_on>1</always_on>
+      <update_rate>2</update_rate>
+      <visualize>true</visualize>
+      <contact>
+        <collision>COLLISION_NAME</collision>
+      </contact>
+    </sensor>
+  </gazebo>
+
