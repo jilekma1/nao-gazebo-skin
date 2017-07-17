@@ -1,8 +1,8 @@
 import numpy as np
-import scipy as sp
+#import scipy as sp
 import xml.etree.ElementTree as ET
 
-ROBOT_DESCRIPTION = "nao_backup.xacro"
+ROBOT_DESCRIPTION = "nao_orig.xacro"
 LINK_TEMPLATE = "link_template.txt"
 SENSOR_TEMPLATE = "sens_template.txt"
 GENERATE_TO_FILE = "sensors.xacro"
@@ -80,9 +80,9 @@ def generate_sensor_file(vertices):
         with open(GENERATE_TO_FILE, "a+") as fid:
             fid.write(data_modif)
 
-def generateSensor2(vertices, LINK="r_wrist", SENSOR_NAME = "Col_Sensor", origFile='nao_backup.xacro'):
+def generateSensor2(vertices, LINK="r_wrist", SENSOR_NAME = "Col_Sensor", origFile='/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao_orig.xacro'):
     '''
-    Modify XML Nao file. It inserts sensors into it. These sensors are ṕut onto Nao LINK.
+    Modify XML Nao file. It inserts sensors into it. These sensors are put onto Nao LINK.
     :param vertices: numpy array Nx3 of vertices where the skin will be placed
     :return:
     '''
@@ -96,7 +96,7 @@ def generateSensor2(vertices, LINK="r_wrist", SENSOR_NAME = "Col_Sensor", origFi
             sensorTemplate = fid.read()
         linkTemplate = linkTemplate.replace("SENSOR_XYZ", str(vertex)[1:-1])
         linkTemplate = linkTemplate.replace("COLLISION_NAME", LINK + '_collision_' + str(i))
-        sensorTemplate = sensorTemplate.replace("COLLISION_NAME", LINK + '_collision')
+        sensorTemplate = sensorTemplate.replace("COLLISION_NAME", LINK + '_collision' + str(i))
         sensorTemplate = sensorTemplate.replace("SENSOR_NAME", LINK + '_collision_sens_' + str(i))
         print(index)
         outXML = outXML[0:index+len('<link name="' + LINK + '"' +  '>')] + linkTemplate + outXML[index + len('<link name="' + LINK + '"' +  '>'):]
@@ -108,38 +108,32 @@ def generateSensor2(vertices, LINK="r_wrist", SENSOR_NAME = "Col_Sensor", origFi
     with open('/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao.xacro', 'w+') as fid:
         fid.write(outXML)
 
-    '''
-    tree = ET.parse(origFile)
-    root = tree.getroot()
-    # find link to which add skin
-    for link in root.findall('link'):
-        name = link.get('name')
-        if name == LINK:
-            print("Found!")
-            break
-    tree._setroot(link)
+def generateSensor_asInICub(vertices, LINK="r_wrist", SENSOR_NAME = "Col_Sensor", origFile='/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao_orig.xacro'):
+    with open(origFile, 'r') as fid:
+        outXML = fid.read()
+    with open(SENSOR_TEMPLATE, 'r') as fid:
+        sensorTemplate = fid.read()
+    collisionBlock = ''
+    for i, vertex in enumerate(vertices):
+        index = outXML.find('<link name="' + LINK + '"' +  '>')
+        with open(LINK_TEMPLATE, 'r') as fid:
+            linkTemplate = fid.read()
+        linkTemplate = linkTemplate.replace("SENSOR_XYZ", str(vertex)[1:-1])
+        linkTemplate = linkTemplate.replace("COLLISION_NAME", LINK + '_collision_' + str(i))
+        collisionBlock = collisionBlock + "\n<collision>" + LINK+ "_collision_" + str(i) + "</collision>"
+        print(index)
+        outXML = outXML[0:index+len('<link name="' + LINK + '"' +  '>')] + linkTemplate + outXML[index + len('<link name="' + LINK + '"' + '>'):]
+        indexRef = outXML.find('<gazebo reference="' + LINK + '"' + '>')
+        print('<gazebo reference="' + LINK + '"' + '>')
+        print(indexRef)
+    sensorTemplate = sensorTemplate.replace("COLLISION_NAME", collisionBlock)
+    sensorTemplate = sensorTemplate.replace("SENSOR_NAME", LINK + '_collision_sens')
+    outXML = outXML[0:indexRef + len('<gazebo reference="' + LINK + '"' + '>')] + sensorTemplate + outXML[indexRef + len('<gazebo reference="' + LINK + '"' + '>'):]
 
-    for i,vertex in enumerate(vertices):
-        vertStr = str(vertices[i,:])
-        vertStr = vertStr[1:-1]
-        # Add visual
-        visual = ET.SubElement(link, 'visual')
-        geometry = ET.SubElement(visual, 'geometry')
-        sphere = ET.SubElement(geometry, 'sphere', attrib={'radius':str(0.01)})
-        origin = ET.SubElement(visual, 'origin', attrib={'rpy': "0 0 0", 'xyz': vertStr})
-        # Add collision
-        collision = ET.SubElement(link, 'collision', attrib={'name':"Sensor_" + str(i) + "_link_collision"})
-        geometry = ET.SubElement(collision, 'geometry')
-        origin = ET.SubElement(collision, 'origin', attrib={'rpy': "0 0 0", 'xyz': vertStr})
-
-
-    tree.write('aaaa.xacro')
-    # add collision bodies and visuals to this link
-
-    # add sensor for each body
-    '''
+    with open('/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao.xacro', 'w+') as fid:
+        fid.write(outXML)
 
 
 verts = loadSurface("nao-rwrist-coords.raw")
-generate_sensor_file(verts)
-#generateSensor2(verts)
+#generate_sensor_file(verts)
+generateSensor_asInICub(verts)

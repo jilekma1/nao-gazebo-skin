@@ -8,4 +8,4 @@ sock.bind((IP, PORT))
  
 while True:
     data, addr = sock.recvfrom(2048)
-    print "Contact sensor message:", data
+    print("Contact sensor message:", data)

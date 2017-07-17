@@ -1,12 +1,12 @@
-	<visual>
+	<visual name="COLLISION_NAME_geom">
       <geometry>
-        <sphere radius="0.0025"/>
+        <box size="0.005 0.005 0.005"/>
       </geometry>
       <origin rpy="0 0 0" xyz="SENSOR_XYZ" />
     </visual>
     <collision name="COLLISION_NAME">
       <geometry>
-        <sphere radius="0.0025"/>
+        <box size="0.005 0.005 0.005"/>
       </geometry>
       <origin rpy="0 0 0" xyz="SENSOR_XYZ" />
     </collision>
