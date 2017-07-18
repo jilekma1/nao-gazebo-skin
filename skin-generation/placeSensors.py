@@ -1,6 +1,7 @@
 import numpy as np
 #import scipy as sp
 import xml.etree.ElementTree as ET
+import pywavefront
 
 ROBOT_DESCRIPTION = "nao_orig.xacro"
 LINK_TEMPLATE = "link_template.txt"
@@ -134,6 +135,64 @@ def generateSensor_asInICub(vertices, LINK="r_wrist", SENSOR_NAME = "Col_Sensor"
         fid.write(outXML)
 
 
+def generatePolylineSensors(vertices,
+                            LINK="torso",
+                            SENSOR_NAME = "Col_Sensor",
+                            origFile='/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao_orig.xacro',
+                            LINK_TEMPLATE = "/home/x200/Documents/Skola/NewNao/code-nao-simulation/skin-generation/polyline_link_template.txt"):
+    # define path of a polyline - vertices on a one line = whole quad
+    #vertices = np.reshape(vertices, (-1, 4))
+    with open(origFile, 'r') as fid:
+        outXML = fid.read()
+    with open(SENSOR_TEMPLATE, 'r') as fid:
+        sensorTemplate = fid.read()
+    collisionBlock = ''
+
+    """
+    geometry = '<polyline>'
+    for i, vertex in enumerate(vertices):
+        geometry = geometry + "<point>" + str(vertex)[1:-1] + "</point>"
+    geometry = geometry + "<height>0.1</height>"
+    geometry = geometry + "</polyline>"
+    """
+
+    for i, vertex in enumerate(vertices):
+        index = outXML.find('<link name="' + LINK + '"' +  '>')
+        with open(LINK_TEMPLATE, 'r') as fid:
+            linkTemplate = fid.read()
+        center = np.mean(np.reshape(vertex, (-1, 3)), 0)
+        center[0] = center[0] + 1
+        linkTemplate = linkTemplate.replace("SENSOR_XYZ", str(center)[1:-1])
+        linkTemplate = linkTemplate.replace("COLLISION_NAME", LINK + '_collision_' + str(i))
+
+        geometry = '<box size="0.001 0.001 0.001"/>'
+        """
+        for j in range(len(vertex)/3):
+            geometry = geometry + "<point>" + str(vertex[j:j+3])[1:-1] + "</point>"
+        geometry = geometry + "<height>0.1</height>"
+        geometry = geometry + "</box>"
+        """
+
+        linkTemplate = linkTemplate.replace("GEOMETRY_VISUAL", geometry)
+        linkTemplate = linkTemplate.replace("GEOMETRY_COLLISION", geometry)
+        collisionBlock = collisionBlock + "\n<collision>" + LINK+ "_collision_" + str(i) + "</collision>"
+        #print(index)
+        outXML = outXML[0:index+len('<link name="' + LINK + '"' +  '>')] + linkTemplate + outXML[index + len('<link name="' + LINK + '"' + '>'):]
+        indexRef = outXML.find('<gazebo reference="' + LINK + '"' + '>')
+        #print('<gazebo reference="' + LINK + '"' + '>')
+        #print(indexRef)
+    sensorTemplate = sensorTemplate.replace("COLLISION_NAME", collisionBlock)
+    sensorTemplate = sensorTemplate.replace("SENSOR_NAME", LINK + '_collision_sens')
+    outXML = outXML[0:indexRef + len('<gazebo reference="' + LINK + '"' + '>')] + sensorTemplate + outXML[indexRef + len('<gazebo reference="' + LINK + '"' + '>'):]
+
+    with open('/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao.xacro', 'w+') as fid:
+        fid.write(outXML)
+
+
 verts = loadSurface("nao-rwrist-coords.raw")
 #generate_sensor_file(verts)
-generateSensor_asInICub(verts)
+#generateSensor_asInICub(10*verts)
+verts = np.loadtxt("torso_skin.raw")
+print(verts)
+verts = verts[0::2, :]
+generatePolylineSensors(verts)
