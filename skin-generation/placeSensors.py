@@ -188,11 +188,64 @@ def generatePolylineSensors(vertices,
     with open('/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao.xacro', 'w+') as fid:
         fid.write(outXML)
 
+def calcRPY(vec1, vec2):
+
+
+def generateIntoSDF(vertices,
+                    LINK="r_wrist",
+                    SENSOR_NAME = "Col_Sensor",
+                    origFile='/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao_orig_sdf.sdf',
+                    LINK_TEMPLATE = "/home/x200/Documents/Skola/NewNao/code-nao-simulation/skin-generation/sdf_link_template.txt",
+                    SENSOR_TEMPLATE="sens_template.txt"):
+    '''
+    This function generates skin from set of vertices. It takes an array of quads (each line is one quad) and places box
+    sensors into their centers.
+    :param vertices: m * 12 array of m quads
+    :param LINK: link name to be covered with skin
+    :param SENSOR_NAME: name of contact sensor
+    :param origFile: file with original nao SDF
+    :param LINK_TEMPLATE: template of a link
+    :param SENSOR_TEMPLATE: template of a sensor
+    :return:
+    '''
+    # define path of a polyline - vertices on a one line = whole quad
+    #vertices = np.reshape(vertices, (-1, 4))
+    with open(origFile, 'r') as fid:
+        outXML = fid.read()
+    with open(SENSOR_TEMPLATE, 'r') as fid:
+        sensorTemplate = fid.read()
+    collisionBlock = ''
+
+    for i, vertex in enumerate(vertices):
+        index = outXML.find("<link name='" + LINK + "'>")
+        print(index)
+        with open(LINK_TEMPLATE, 'r') as fid:
+            linkTemplate = fid.read()
+        center = np.mean(np.reshape(vertex, (-1, 3)), 0)
+
+        pose = '<pose>' + str(center)[1:-1] + ' 0 0 0' + '</pose>'
+
+        linkTemplate = linkTemplate.replace("POSE", pose)
+        linkTemplate = linkTemplate.replace("COLLISION_NAME", LINK + '_collision_' + str(i))
+
+        geometry = '<box> <size>0.01 0.01 0.01</size></box>'
+
+        linkTemplate = linkTemplate.replace("GEOMETRY_VISUAL", geometry)
+        linkTemplate = linkTemplate.replace("GEOMETRY_COLLISION", geometry)
+        collisionBlock = collisionBlock + "\n<collision>" + LINK+ "_collision_" + str(i) + "</collision>"
+        outXML = outXML[0:index+len('<link name="' + LINK + '"' +  '>')] + linkTemplate + outXML[index + len('<link name="' + LINK + '"' + '>'):]
+    indexRef = outXML.find("<link name='" + LINK + "'>")
+    sensorTemplate = sensorTemplate.replace("COLLISION_NAME", collisionBlock)
+    sensorTemplate = sensorTemplate.replace("SENSOR_NAME", LINK + '_collision_sens')
+    outXML = outXML[0:indexRef + len('<link name="' + LINK + '"' +  '>')] + sensorTemplate + outXML[indexRef + len('<link name="' + LINK + '"' +  '>'):]
+
+    with open('/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao.sdf', 'w+') as fid:
+        fid.write(outXML)
 
 verts = loadSurface("nao-rwrist-coords.raw")
 #generate_sensor_file(verts)
 #generateSensor_asInICub(10*verts)
-verts = np.loadtxt("torso_skin.raw")
+verts = np.loadtxt("rArm_skin.raw")
 print(verts)
-verts = verts[0::2, :]
-generatePolylineSensors(verts)
+
+generateIntoSDF(verts)
