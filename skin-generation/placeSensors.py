@@ -189,14 +189,53 @@ def generatePolylineSensors(vertices,
         fid.write(outXML)
 
 def calcRPY(vec1, vec2):
+    vd = vec2
+    x = vd[0]
+    y = vd[1]
+    z = vd[2]
+    #yaw = np.arctan(vd[0]/-vd[2])
+    #pitch = np.arctan(np.sqrt(vd[0]**2 + vd[1]**2)/vd[2])
+    #roll = np.arctan(vd[1]/vd[0])
+    #yaw = np.arctan2(y, x)
+    #l = np.sqrt(x*x + y*y)
+    #pitch = np.arctan2(z, l)
 
+    roll = np.arctan2(z, y) + 3.14/2
+    pitch = 0
+    l = np.sqrt(y*y + z*z)
+    u = np.sqrt(x*x + y*y + z*z)
+    yaw = (3.14/2)+np.arcsin(l/u)
+    #yaw = 0
+
+    yaw = np.arctan2(x, (-y)) + 3.14/2
+    pitch = -np.arctan2(np.sqrt(x*x + y*y), z)
+
+
+    #yaw = np.arctan2(x, z)
+    #pitch = np.arctan2(l, y)
+
+    #pitch = asin(-vec);
+    #yaw = atan2(d.X, d.Z)
+    return np.array([0, pitch, yaw])
+
+def calcNormal(vertices):
+    '''
+    :param vertices: m * 3 array of m points
+    :return: surface normal
+    '''
+    vertices = np.reshape(vertices, (-1, 3))
+    a = vertices[1,:] - vertices[0, :]
+    b = vertices[2,:] - vertices[0, :]
+    return np.cross(a,b)
 
 def generateIntoSDF(vertices,
                     LINK="r_wrist",
                     SENSOR_NAME = "Col_Sensor",
                     origFile='/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao_orig_sdf.sdf',
+                    outputFile = '/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao.sdf',
                     LINK_TEMPLATE = "/home/x200/Documents/Skola/NewNao/code-nao-simulation/skin-generation/sdf_link_template.txt",
-                    SENSOR_TEMPLATE="sens_template.txt"):
+                    SENSOR_TEMPLATE="sens_template.txt",
+                    SENSOR_SIZE = '0.005 0.003 0.001'):
     '''
     This function generates skin from set of vertices. It takes an array of quads (each line is one quad) and places box
     sensors into their centers.
@@ -218,17 +257,21 @@ def generateIntoSDF(vertices,
 
     for i, vertex in enumerate(vertices):
         index = outXML.find("<link name='" + LINK + "'>")
-        print(index)
         with open(LINK_TEMPLATE, 'r') as fid:
             linkTemplate = fid.read()
         center = np.mean(np.reshape(vertex, (-1, 3)), 0)
 
-        pose = '<pose>' + str(center)[1:-1] + ' 0 0 0' + '</pose>'
+        normal = calcNormal(vertex)
+
+        rpy = calcRPY(np.array([0,0,1]), normal)
+        print(rpy)
+
+        pose = '<pose>' + str(center)[1:-1] + str(rpy)[1:-1] + '</pose>'
 
         linkTemplate = linkTemplate.replace("POSE", pose)
         linkTemplate = linkTemplate.replace("COLLISION_NAME", LINK + '_collision_' + str(i))
 
-        geometry = '<box> <size>0.01 0.01 0.01</size></box>'
+        geometry = '<box> <size>'+ SENSOR_SIZE + '</size></box>'
 
         linkTemplate = linkTemplate.replace("GEOMETRY_VISUAL", geometry)
         linkTemplate = linkTemplate.replace("GEOMETRY_COLLISION", geometry)
@@ -239,13 +282,34 @@ def generateIntoSDF(vertices,
     sensorTemplate = sensorTemplate.replace("SENSOR_NAME", LINK + '_collision_sens')
     outXML = outXML[0:indexRef + len('<link name="' + LINK + '"' +  '>')] + sensorTemplate + outXML[indexRef + len('<link name="' + LINK + '"' +  '>'):]
 
-    with open('/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao.sdf', 'w+') as fid:
+    with open(outputFile, 'w+') as fid:
         fid.write(outXML)
+
+
+#def generateWholeSkin(vertices)
+
+def generateWholeSkin(verticesFiles, sensorSizes, sensorNames, linkNames, origFile, outputFile):
+    for i, file in enumerate(verticesFiles):
+        if i>0:
+            origFile = outputFile
+        verts = np.loadtxt(file)
+        generateIntoSDF(verts,
+                        LINK = linkNames[i],
+                        SENSOR_NAME=sensorNames[i],
+                        SENSOR_SIZE=sensorSizes[i],
+                        origFile = origFile,
+                        outputFile = outputFile)
+
 
 verts = loadSurface("nao-rwrist-coords.raw")
 #generate_sensor_file(verts)
 #generateSensor_asInICub(10*verts)
 verts = np.loadtxt("rArm_skin.raw")
-print(verts)
+verts = np.loadtxt("torso_skin.raw")
+#generateIntoSDF(verts)
 
-generateIntoSDF(verts)
+generateIntoSDF(verts, LINK='torso_link',
+                SENSOR_NAME="Col_Sensor",
+                origFile='/home/x200/catkin_ws/src/nao_gazebo/gazebo_naoqi_control/models/nao_orig_sdf.sdf',
+                LINK_TEMPLATE="/home/x200/Documents/Skola/NewNao/code-nao-simulation/skin-generation/sdf_link_template.txt",
+                SENSOR_TEMPLATE="sens_template.txt")
