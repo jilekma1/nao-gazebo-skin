@@ -1,4 +1,6 @@
 #include "ContactPlugin.hh"
+#include <memory>
+#include <string>
 
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(ContactPlugin)
@@ -21,7 +23,7 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   // Get the parent sensor.
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
+    std::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
 
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
@@ -48,16 +50,21 @@ void ContactPlugin::OnUpdate()
   // Get all the contacts.
   msgs::Contacts contacts;
   contacts = this->parentSensor->GetContacts();
-  char arr[] = "Contact detected";
-  this->SendUDP(arr);
+  //uint32_t sensID = this->parentSensor->Id();
+  //std::string = this->parentSensor->GetCollisionName(sensID);
 
   for (unsigned int i = 0; i < contacts.contact_size(); ++i)
   {
 	//std::cout << "Sensor" << this->parentSensor.GetName() << "sensed collision.";
 
-    std::cout << "Collision between[" << contacts.contact(i).collision1()
-              << "] and [" << contacts.contact(i).collision2() << "]\n";
+    //std::cout << "Collision between[" << contacts.contact(i).collision1()
+    //          << "] and [" << contacts.contact(i).collision2() << "]\n";
+	std::string arr = contacts.contact(i).collision1();
+	char c[1024];
+	strcpy(c, arr.c_str());
 
+    this->SendUDP(c);
+	/*
     for (unsigned int j = 0; j < contacts.contact(i).position_size(); ++j)
     {
       std::cout << j << "  Position:"
@@ -70,6 +77,7 @@ void ContactPlugin::OnUpdate()
                 << contacts.contact(i).normal(j).z() << "\n";
       std::cout << "   Depth:" << contacts.contact(i).depth(j) << "\n";
     }
+	*/
 
   }
 }
