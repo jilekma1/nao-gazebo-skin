@@ -1,8 +1,9 @@
 <sensor name="SENSOR_NAME" type="contact">
+  <plugin name="my_plugin" filename="/home/x200/Documents/Skola/NewNao/code-nao-simulation/gazebo-skin-plugin/gazebo_ContactSensor_plugin/build/libcontact.so" />
   <always_on>1</always_on>
   <visualize>true</visualize>
   <contact>
 	COLLISION_NAME
   </contact>
-  <update_rate>100</update_rate>
+  <update_rate>10</update_rate>
 </sensor>

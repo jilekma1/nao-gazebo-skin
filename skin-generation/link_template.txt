@@ -9,4 +9,5 @@
         <box size="0.005 0.005 0.005"/>
       </geometry>
       <origin rpy="0 0 0" xyz="SENSOR_XYZ" />
+	  <max_contacts>1</max_contacts>
     </collision>

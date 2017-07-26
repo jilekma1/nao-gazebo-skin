@@ -256,8 +256,11 @@ def generateIntoSDF(vertices,
         sensorTemplate = fid.read()
     collisionBlock = ''
 
+
+
     for i, vertex in enumerate(vertices):
         index = outXML.find("<link name='" + LINK + "'>")
+
         with open(LINK_TEMPLATE, 'r') as fid:
             linkTemplate = fid.read()
         center = np.mean(np.reshape(vertex, (-1, 3)), 0)
@@ -283,6 +286,10 @@ def generateIntoSDF(vertices,
     sensorTemplate = sensorTemplate.replace("COLLISION_NAME", collisionBlock)
     sensorTemplate = sensorTemplate.replace("SENSOR_NAME", LINK + '_collision_sens')
     outXML = outXML[0:indexRef + len('<link name="' + LINK + '"' +  '>')] + sensorTemplate + outXML[indexRef + len('<link name="' + LINK + '"' +  '>'):]
+    #indexRef = outXML.find("<link name='" + LINK + "'>")
+    #outXML = outXML[0:indexRef + len('<link name="' + LINK + '"' + '>')] + "<self_collide>true</self_collide>" + outXML[
+    #                                                                                                             indexRef + len(
+    #                                                                                                                 '<link name="' + LINK + '"' + '>'):]
     #outXML = outXML[0:indexRef + len("<model name='nao'>")] + '<plugin name="model_push" filename="libcontact_model_plugin.so"/>' + outXML[indexRef + len("<model name='nao'>"):]
     print(i)
 

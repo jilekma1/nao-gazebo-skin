@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctime>
+#include <sstream>
+#include <set>
 
 #define MAX_BUF 100
 #define PORT "9091"
@@ -57,5 +60,14 @@ namespace gazebo
   int count;
   int addrlen;
   };
+/*
+
+ class TimeReader : public Sensor
+ {
+  public: TimeReader();
+  public: ~TimeReader();
+  public: double GetSimTime(sensors::SensorPtr _sensor);
+ }*/
+
 }
 #endif

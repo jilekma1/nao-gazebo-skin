@@ -67,13 +67,14 @@ def exploreJoints(start_joint, toVisit_joints, jointNames, effectorName):
 	collisionTimeStamps = list()
 	currentsInTime = list()
 	currentTimes = list()
-	fractionMaxSpeed = 0.1
+	fractionMaxSpeed = 0.01
 	motionProxy = ALProxy("ALMotion", IP_ROBOT, PORT)
 	memoryProxy = ALProxy("ALMemory", IP_ROBOT, PORT)
 	ttsProxy = ALProxy("ALTextToSpeech", IP_ROBOT, PORT)
 	ledsProxy = ALProxy("ALLeds", IP_ROBOT, PORT)
 
 	s = SkinDriver()
+	motionProxy.wakeUp()
 
 	for joint in jointNames:
 		motionProxy.setStiffnesses(joint, 0.8)
