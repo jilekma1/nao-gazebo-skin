@@ -48,17 +48,16 @@ void ContactPlugin::OnUpdate()
 {
   // Get all the contacts.
   msgs::Contacts contacts;
-  contacts = this->parentSensor->GetContacts();
+  contacts = this->parentSensor->Contacts();
   std::set<std::pair<std::string, std::string>> measuredSet;
   for (unsigned int i = 0; i < contacts.contact_size(); ++i)
   {
 
   std::string col1 = contacts.contact(i).collision1();
   std::string col2 = contacts.contact(i).collision2();
-  std::cout << "next" << "\n";
+
   if(measuredSet.count(std::make_pair(col1, col2)) == 0)
   {
-    std::cout << col1 << col2 <<"\n";
 	common::Time msgTime = msgs::Convert(contacts.contact(i).time());
 	std::string col;
 
@@ -82,7 +81,7 @@ void ContactPlugin::OnUpdate()
 		std::cout << "Colliding segment not found!" << "\n";
 	
 	ss << col << "::" << msgTime.FormattedString() << "::" << realTime.tv_sec << "::" << realTime.tv_nsec;
-	std::cout << col1 << "::" << col2 << "::" << msgTime.FormattedString() << "::" << realTime.tv_sec << "::" << realTime.tv_nsec;
+	//std::cout << col1 << "::" << col2 << "::" << msgTime.FormattedString() << "::" << realTime.tv_sec << "::" << realTime.tv_nsec;
 	std::string ts = ss.str();
     strcpy(c, ts.c_str());
 
@@ -108,7 +107,6 @@ void ContactPlugin::OnUpdate()
     my_addr.sin_port = 0;
 
     bind(this->sockd, (struct sockaddr*)&(this->my_addr), sizeof(this->my_addr));
-    std::cout << "Socket created";
 
     strcpy(this->buf, "UDP status OK...");
 
