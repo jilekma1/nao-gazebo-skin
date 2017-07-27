@@ -6,16 +6,17 @@ class SkinDriver:
 	def __init__(self, IP = "127.0.0.1", PORT = 9091):
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.sock.bind((IP, PORT))
-		#self.sock.setblocking(0)
 
 	def GetDataOnce(self, timeout):
-		#ready = select.select([self.sock], [], [], timeout)
+		"""
+		Function which reads data about one collision from UDP
+		:param timeout: this is max time limit (in s) for which function will be waiting for collision data from skin
+		:return: structure with parsed collision data, -1 if collision not detected
+		"""
 		try:
 			self.sock.settimeout(timeout)
 			data = 1
 			data, addr = self.sock.recvfrom(2048)
-			#print(data)
-
 			data = data.split("::")
 			link = data[1]
 			ID = data[2].split("_")
@@ -27,17 +28,9 @@ class SkinDriver:
 
 			CollisionStruct = namedtuple("CollisionStruct", "sensor ID1 simTime realTime_s realTime_ns")
 			cs = CollisionStruct(data[1], ID , simTime, realTime_s, realTime_ns)
-
-			#merge collisions with same time
 			print cs
-
-			return 1
+			return cs
 		except socket.timeout:
-			#print "No collision"
 			return -1
-
-#s = SkinDriver()
-#while True:
-#	s.GetDataOnce(0.01)
 			
 

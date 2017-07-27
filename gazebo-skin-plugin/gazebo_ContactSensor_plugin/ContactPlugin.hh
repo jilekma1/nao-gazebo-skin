@@ -60,14 +60,5 @@ namespace gazebo
   int count;
   int addrlen;
   };
-/*
-
- class TimeReader : public Sensor
- {
-  public: TimeReader();
-  public: ~TimeReader();
-  public: double GetSimTime(sensors::SensorPtr _sensor);
- }*/
-
 }
 #endif

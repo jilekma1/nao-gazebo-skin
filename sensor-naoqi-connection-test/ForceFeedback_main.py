@@ -25,10 +25,11 @@ from naoqi import ALProxy
 import numpy as np
 import motion
 import time
-from UDP_listener import SkinDriver
+from skin_driver import SkinDriver
 
 # Defines
 POS_FILE_NAME = "R_collisions3_longerseq.txt"
+#POS_FILE_NAME = "L_collisions_demo.txt"
 PORT = 9559
 IP_ROBOT = "127.0.0.1"
 CURRENT_LIMIT = 0.13
@@ -67,7 +68,7 @@ def exploreJoints(start_joint, toVisit_joints, jointNames, effectorName):
 	collisionTimeStamps = list()
 	currentsInTime = list()
 	currentTimes = list()
-	fractionMaxSpeed = 0.01
+	fractionMaxSpeed = 0.1
 	motionProxy = ALProxy("ALMotion", IP_ROBOT, PORT)
 	memoryProxy = ALProxy("ALMemory", IP_ROBOT, PORT)
 	ttsProxy = ALProxy("ALTextToSpeech", IP_ROBOT, PORT)
@@ -124,25 +125,3 @@ def runExploration():
 					  effectorName='RArms')
 
 runExploration()
-
-"""
-if __name__ == "__main__":
-	try:
-		pos_joint = np.loadtxt("RArm_cols_2.txt", comments="#", delimiter=" ", unpack=False)
-		print(pos_joint)
-		posToVisit_joint = (pos_joint[:, 0:6]).tolist()
-		posToVisit_joint[:,3] = [x + 0.1 for x in posToVisit_joint[:,3]]
-
-		exploreJoints(start_joint=RsafePosition_joint,
-				toVisit_joints=posToVisit_joint,
-				jointNames=NAMES,
-				effectorName='RArms')
-
-	except KeyboardInterrupt:
-		print("User initiated program shutdown! Moving to safe position...")
-		motionProxy = ALProxy("ALMotion", IP_ROBOT, PORT)
-		motionProxy.setCollisionProtectionEnabled('Arms', True)
-		motionProxy.setAngles(["RShoulderPitch", "RShoulderRoll", "RElbowYaw","RElbowRoll","RWristYaw","RHand"],
-							  R_SAFE_POSITION,
-							  fractionMaxSpeed)
-"""
