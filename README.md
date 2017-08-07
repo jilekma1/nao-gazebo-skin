@@ -12,7 +12,10 @@ In fact you must install gcc/g++ 4.9 and pass it to update-alternatives like thi
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 50 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9
 
 Then you can switch default compiler with:
+
     sudo update-alternatives --config gcc
+
+Whole plugin schematics can be found here: https://github.com/martinj8649/nao-gazebo-skin/tree/master/docs/nao_gazebo_skin_schematics.png
     
 
 __2) robot-models__
@@ -37,6 +40,3 @@ NOTE: This experiment is slightly modified - positions were sampled with differe
 
 __5) gazebo-skin plugin__
 This is a Gazebo sensor plugin for our skin, which reads collision data and does some preprocessing. It contains UDP server, which publishes processed collision data on port 9091 (in form of strings).
-
-__Whole project schematics__
-[whole_schema]: https://github.com/martinj8649/nao-gazebo-skin/docs/nao_gazebo_skin_schematics.png "Schematics of a skin plugin"
