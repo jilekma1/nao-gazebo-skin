@@ -1,5 +1,11 @@
-# Description of structure of this repository
-This repository contains a set of tools for NAO robot simulation:
+# Description of this project
+This repository contains a set of tools for NAO robot simulation and artificial skin. There are two main components, plugin, which allows you to control Nao in Gazebo via NAOqi, and skin plugin, which publishes contact info on specified port. There is also a skin generator and Python skin driver for usage with naoqi SDK.
+
+Schematics can be found here:
+https://github.com/martinj8649/nao-gazebo-skin/tree/master/docs/nao_gazebo_skin_schematics.png
+
+Below is description of structure of this repository.
+
 ## 1) nao-gazebo-modified-for-G7
 This is basically nao-gazebo plugin (https://github.com/costashatz/nao_gazebo) modified to work with Gazebo 7 and ROS Indigo.
 To use it, put it into your catkin workspace and compile it. 
@@ -15,8 +21,6 @@ In fact you must install gcc/g++ 4.9 and pass it to update-alternatives like thi
 Then you can switch default compiler with:
 
     sudo update-alternatives --config gcc
-
-Whole plugin schematics can be found here: https://github.com/martinj8649/nao-gazebo-skin/tree/master/docs/nao_gazebo_skin_schematics.png
 
 ## 2) robot-models
 Here you can find nao robot models. All are based on nao-gazebo plugin model. There are .xacro files, which are not used by our project at this moment. Two files are important:
@@ -42,4 +46,4 @@ NOTE: This experiment is slightly modified - positions were sampled with differe
 This is a Gazebo sensor plugin for our skin, which reads collision data and does some preprocessing. It contains UDP server, which publishes processed collision data on port 9091 (in form of strings).
 
 # Copyright
-All code except nao-gazebo-modified-for-G7 and model of Nao is released under GNU GPL v3 and copyrighted by Martin Jilek. Nao-gazebo-modified-for-G7 is modified version of nao_gazebo plugin copyrighted by Konstantinos Chatzilygeroudis. Modified model nao.xacro in robot-models was also part of nao_gazebo plugin. These two parts are released under BSD license. For details see files LICENSE.txt of particular folders.
+All code except nao-gazebo-modified-for-G7 and model of Nao (nao.xacro) is released under GNU GPL v3 and copyrighted by Martin Jilek. Nao-gazebo-modified-for-G7 is modified version of nao_gazebo plugin copyrighted by Konstantinos Chatzilygeroudis. Modified model nao.xacro in robot-models was also part of nao_gazebo plugin. These two parts are released under BSD license. For details see files LICENSE.txt of particular folders.
