@@ -1,24 +1,20 @@
 '''
-Main controller of robot motion with current-feedback collision detection. For tips how to use it
-read description of ForceFeedbackExperiment.py.
+Program for testing collision detection of a Nao robot. 
+Originally worked with current feedback, "dirty"-adapted to use artificial skin.
+Copyright (C) 2017  Martin Jilek
 
-Before starting experiment you could want to configure the controller. It can be done in the Defines section
-of this file. Most important parameters are:
-POS_FILE_NAME: this .txt file contains target robot configurations (every row is one configuration).
-You can generate it eg. with our program contact_finder.py.
-PORT: probably not that important... robot has got 9559 almost every time...
-IP_ROBOT: important, can be determined by short-press of robot chest button
-CURRENT_LIMIT: important setting of collision detector, this value (0.14) was hand-tuned to be safe.
-Make it higher only when you know what you are doing!
-ARM: important, effector name. "RArm" or "LArm".
-RsafePosition_joint, LsafePosition_joint: these values were hand-tuned to be safe. No need to change them.
-r_names, l_names: no need to change them. It is mapping of joint names to their respective coordinates.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Functions:
- ->saveDataset: function which saves timestamps of recorded events (collisions, movement starts)
- ->exploreJoints: function which takes list of joint coordinates and drives robot to them. Also
- 				contains collision detector.
- ->runExploration: function which wraps exploreJoints for easier multithreaded usage
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from naoqi import ALProxy

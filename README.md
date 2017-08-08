@@ -1,5 +1,6 @@
+#Description of structure of this repository
 This repository contains a set of tools for NAO robot simulation:
-__1) nao-gazebo-modified-for-G7__
+##1) nao-gazebo-modified-for-G7
 This is basically nao-gazebo plugin (https://github.com/costashatz/nao_gazebo) modified to work with Gazebo 7 and ROS Indigo.
 To use it, put it into your catkin workspace and compile it. 
 
@@ -16,15 +17,14 @@ Then you can switch default compiler with:
     sudo update-alternatives --config gcc
 
 Whole plugin schematics can be found here: https://github.com/martinj8649/nao-gazebo-skin/tree/master/docs/nao_gazebo_skin_schematics.png
-    
 
-__2) robot-models__
+##2) robot-models
 Here you can find nao robot models. All are based on nao-gazebo plugin model. There are .xacro files, which are not used by our project at this moment. Two files are important:
  -> nao_skin_hand_corrected.sdf : this file is what generates artificial skin generator, but skin segments placement is corrected by hand, but there is a problem that nao loses gravity when multiple self_collide tags are set to true
  -> nao_hand_corrected_no_gravity_bug.sdf : issue with self_collide tags is solved
  -> __nao_final.sdf : most recent and working model (27.7.2017)__, skin on r_wrist, l_wrist, Head and base_link.
 
-__3) skin-generation__
+##3) skin-generation
 Here you can find many files. For us, the important ones are:
 -> link_template.txt: this is template, which will be modified by skin generator and inserted into link sdf description for each taxel
 -> sens_template.txt: this is template of a skin sensor, again modified by generator and inserted
@@ -33,10 +33,13 @@ Here you can find many files. For us, the important ones are:
 -> placeSensors.py: called by wholeSkinGenerator, there are more functions, most of them 
 are old and were used in first stages of development - focus on __generateIntoSDF()__ and __generateWholeSkin()__.
 
-__4) sensor-naoqi-connection-test__
+##4) sensor-naoqi-connection-test
 This is a complete setup of a contact experiment, where the robot tries to reach predefined collision (self-touch) configurations. Collisions are simply reported into the command line.
 Just set variables POS_FILE_NAME to path to file with configurations in joint space and ARM ("LArm", "RArm"). Remember, for each hand joint space you need different coordinates! Arms are different...
 NOTE: This experiment is slightly modified - positions were sampled with different Nao model, so in some positions robot is not able to touch itself, when it should. So to fourth joint here is added angle 0.3 rad (lines 116, 119).
 
-__5) gazebo-skin plugin__
+##5) gazebo-skin plugin
 This is a Gazebo sensor plugin for our skin, which reads collision data and does some preprocessing. It contains UDP server, which publishes processed collision data on port 9091 (in form of strings).
+
+#Copyright
+All code except nao-gazebo-modified-for-G7 and model of Nao is released under GNU GPL v3 and copyrighted by Martin Jilek. Nao-gazebo-modified-for-G7 is modified version of nao_gazebo plugin copyrighted by Konstantinos Chatzilygeroudis. Modified model nao.xacro in robot-models was also part of nao_gazebo plugin. These two parts are released under BSD license. For details see files LICENSE.txt of particular folders.
