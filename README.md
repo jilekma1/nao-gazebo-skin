@@ -8,7 +8,11 @@ Below is description of structure of this repository.
 
 ## 1) nao-gazebo-modified-for-G7
 This is basically nao-gazebo plugin (https://github.com/costashatz/nao_gazebo) modified to work with Gazebo 7 and ROS Indigo.
-To use it, put it into your catkin workspace and compile it. 
+To use it, put it into your catkin workspace. Before compilation, you must specify path to your naoqi simulator SDK and naoqi C++ SDK (lines 4, 5 in FindNAOqiSIM.cmake in gazebo_naoqi_control/cmake).
+
+In folder with extracted naoqi C++ SDK, go into etc/naoqi and in file autoload.ini uncomment dcm_hal.
+
+Then you can compile it.
 
 For succesfull compilation on Ubuntu 14.04 (default for ROS Indigo), you might need at least gcc 4.9 (because of a c++ 11 features). You can have more versions of gcc with update-alternatives - try to look here: https://codeyarns.com/2015/02/26/how-to-switch-gcc-version-using-update-alternatives/
 
